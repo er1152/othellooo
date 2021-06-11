@@ -42,6 +42,29 @@ def draw_stone():
                 continue
 
 
+def show_result():
+    black_count = 0
+    white_count = 0
+    for y in range(10):
+        for x in range(10):
+            if field[y][x] == 2:
+                black_count += 1
+            else:
+                white_count += 1
+    if black_count > white_count:
+        if player_color == 2:
+            print("player(black) win!!")
+        else:
+            print("cpu(black) win!!")
+    elif black_count < white_count:
+        if player_color == 1:
+            print("player(white) win!!")
+        else:
+            print("cpu(white) win!!")
+    else:
+        print("draw!!")
+
+
 def check(xpos, ypos, color):
     reverse_list = []
    # reverseする側（my_color）とされる側（opponet_color）/ 2(black) or 1(white)
@@ -89,12 +112,25 @@ def reverse_stone(xpos, ypos, color):  # ひっくり返す(fieldを書き換え
     return
 
 
-def is_pass():
-    return
+def is_pass(color):
+    is_placeable_list = []
+    for y in range(10):
+        for x in range(10):
+            if check(x, y, color):
+                is_placeable_list.append((x, y))
+    return is_placeable_list
 
 
 def player_turn():
     print("player turn!!")
+    global pass_count
+
+    if not is_pass(player_color):
+        pass_count += 1
+        print("player:pass")
+        return
+
+    pass_count = 0
     while True:
         clock.tick(3)
         drow_line()
@@ -109,22 +145,19 @@ def player_turn():
                     continue
                 else:
                     reverse_stone(xpos, ypos, player_color)
-
                     return
 
 
 def cpu_turn():
     print("cpu turn!!")
-    is_pass = False
-    is_placeable_list = []
-    for y in range(10):
-        for x in range(10):
-            if check(x, y, cpu_color):
-                is_placeable_list.append((x, y))
+    global pass_count
+    is_placeable_list = is_pass(cpu_color)
     if not is_placeable_list:
         print("cpu:pass")
+        pass_count += 1
         return
     else:
+        pass_count = 0
         x, y = is_placeable_list[random.randrange(len(is_placeable_list))]
         reverse_stone(x, y, cpu_color)
         clock.tick(10)
@@ -155,8 +188,9 @@ def main():
     check_list = [(-1, -1), (0, -1), (1, -1), (-1, 0),
                   (1, 0), (-1, 1), (0, 1), (1, 1)]
 
-    for i in range(100):  # 最大100ターン
+    pass_count = 0
 
+    for i in range(120):  # 最大100ターン
         is_finish = True  # ターン変わるたびにゲーム終了かの判定
         for y in range(10):
             for x in range(10):
@@ -167,34 +201,24 @@ def main():
                 continue
             break
 
-        if is_finish:
+        if is_finish or pass_count == 2:
             print("finish!!")
+            show_result()
 
         else:  # ゲームが続いているなら
             if i % 2 == 0:
                 player_turn()
             else:
                 cpu_turn()
-
-        drow_line()
-        draw_stone()
-
-
-'''    while True:
+    while True:
         clock.tick(60)
         drow_line()
         draw_stone()
-        print("131")
-
-        for event in pygame.event.get():        # 閉じるボタンが押されたとき
+        for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit(0)
-            if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    pygame.quit()
-                    sys.exit
-'''
+
 
 if __name__ == "__main__":
     main()
