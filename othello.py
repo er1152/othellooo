@@ -49,8 +49,11 @@ def show_result():
         for x in range(10):
             if field[y][x] == 2:
                 black_count += 1
-            else:
+            elif field[y][x] == 1:
                 white_count += 1
+    print("black:"+str(black_count))
+    print("white:"+str(white_count))
+
     if black_count > white_count:
         if player_color == 2:
             print("player(black) win!!")
@@ -187,7 +190,7 @@ def main():
     global check_list
     check_list = [(-1, -1), (0, -1), (1, -1), (-1, 0),
                   (1, 0), (-1, 1), (0, 1), (1, 1)]
-
+    global pass_count
     pass_count = 0
 
     for i in range(120):  # 最大100ターン
@@ -201,15 +204,17 @@ def main():
                 continue
             break
 
-        if is_finish or pass_count == 2:
+        if is_finish or pass_count >= 2:
             print("finish!!")
             show_result()
+            break
 
         else:  # ゲームが続いているなら
             if i % 2 == 0:
                 player_turn()
             else:
                 cpu_turn()
+
     while True:
         clock.tick(60)
         drow_line()
