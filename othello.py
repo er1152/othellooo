@@ -1,4 +1,4 @@
-# https://niwakomablog.com/othello44-python-application/
+# 参考：https://niwakomablog.com/othello44-python-application/
 import pygame
 from pygame.locals import *
 import sys
@@ -15,7 +15,6 @@ def drow_line():
     sprite.update()
     sprite.draw(screen)
     pygame.display.update()
-
     screen.fill((255, 255, 255))
 
     for xpos in range(X_ST, (8*DIS+X_ST+1), DIS):
@@ -68,17 +67,16 @@ def show_result():
         print("draw!!")
 
 
-def check(xpos, ypos, color):
+def check(xpos, ypos, color):  # 与えられたマスに置けるかどうかチェック
     reverse_list = []
-   # reverseする側（my_color）とされる側（opponet_color）/ 2(black) or 1(white)
-    enemy_color = 2 if color == 1 else 1
+    enemy_color = 2 if color == 1 else 1   # reverseする側（color）とされる側（enemy_color）
 
-    if field[ypos][xpos] != 0:
+    if field[ypos][xpos] != 0:  # 空いてなかったらFalse
         return False
 
     for dy, dx in check_list:
         ny, nx = ypos+dy, xpos+dx
-        if field[ny][nx] == enemy_color:  # 置けそうだったら
+        if field[ny][nx] == enemy_color:  # 置けそう(隣にenemy_color)だったら
             tmp = [(xpos, ypos)]
             while field[ny][nx] == enemy_color:  # 連鎖スタート
                 tmp.append((nx, ny))
@@ -92,30 +90,30 @@ def check(xpos, ypos, color):
 
 def reverse_stone(xpos, ypos, color):  # ひっくり返す(fieldを書き換える)
     reverse_list = []
-    # 相手の色　2(black) or 1(white)
     enemy_color = 2 if color == 1 else 1
 
     for dy, dx in check_list:
         nx, ny = xpos+dx, ypos+dy
-        if field[ny][nx] == enemy_color:  # 置けそうだったら
+        if field[ny][nx] == enemy_color:
             tmp = [(xpos, ypos)]
-            while field[ny][nx] == enemy_color:  # 連鎖スタート
+            while field[ny][nx] == enemy_color:
                 tmp.append((nx, ny))
                 nx += dx
                 ny += dy
 
-            if field[ny][nx] == color:  # 連鎖の先に自分と同じ色があるなら
+            if field[ny][nx] == color:
                 while tmp:
                     reverse_list.append(tmp.pop())  # rewrite_listにつっこむ
             else:
                 tmp.clear()
-    for x, y in reverse_list:  # reverse_listから取り出しひっくり返す
+
+    for x, y in reverse_list:  # reverse_listから取り出しひっくり返す(field[y][x]を書き換える)
         field[y][x] = color
-    draw_stone()
+
     return
 
 
-def is_pass(color):
+def is_pass(color):  # パスかどうか判定(戻り値は置ける座標のリスト)
     is_placeable_list = []
     for y in range(10):
         for x in range(10):
@@ -135,7 +133,7 @@ def player_turn():
 
     pass_count = 0
     while True:
-        clock.tick(3)
+        clock.tick(10)
         drow_line()
         draw_stone()
         for event in pygame.event.get():
@@ -143,7 +141,7 @@ def player_turn():
                 pygame.quit()
                 sys.exit()
             if(event.type == MOUSEBUTTONDOWN and event.button == 1 and (event.pos[0] >= 100 and event.pos[0] < 740)):
-                xpos, ypos = (event.pos[0]-100)//80+1, event.pos[1]//80+1
+                xpos, ypos = (event.pos[0]-100)//80 + 1, event.pos[1]//80+1
                 if not check(xpos, ypos, player_color):
                     continue
                 else:
@@ -152,6 +150,8 @@ def player_turn():
 
 
 def cpu_turn():
+    clock.tick(10)
+    draw_stone()
     print("cpu turn!!")
     global pass_count
     is_placeable_list = is_pass(cpu_color)
@@ -163,8 +163,6 @@ def cpu_turn():
         pass_count = 0
         x, y = is_placeable_list[random.randrange(len(is_placeable_list))]
         reverse_stone(x, y, cpu_color)
-        clock.tick(10)
-        draw_stone()
         return
 
 
@@ -193,7 +191,7 @@ def main():
     global pass_count
     pass_count = 0
 
-    for i in range(120):  # 最大100ターン
+    for i in range(120):  # 最大120ターン
         is_finish = True  # ターン変わるたびにゲーム終了かの判定
         for y in range(10):
             for x in range(10):
@@ -204,7 +202,7 @@ def main():
                 continue
             break
 
-        if is_finish or pass_count >= 2:
+        if is_finish or pass_count >= 2:  # 全マス埋まってるかパスが連続で起こった時
             print("finish!!")
             show_result()
             break
