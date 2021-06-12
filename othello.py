@@ -161,8 +161,14 @@ def cpu_turn():
         return
     else:
         pass_count = 0
-        x, y = is_placeable_list[random.randrange(len(is_placeable_list))]
-        reverse_stone(x, y, cpu_color)
+        max_eval = -100
+        xy = [0, 0]
+        for x, y in is_placeable_list:
+            if max_eval < eval_list[y][x]:
+                max_eval = eval_list[y][x]
+                xy = [x, y]
+
+        reverse_stone(xy[0], xy[1], cpu_color)
         return
 
 
@@ -190,6 +196,18 @@ def main():
                   (1, 0), (-1, 1), (0, 1), (1, 1)]
     global pass_count
     pass_count = 0
+    global eval_list
+    eval_list = ((0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+                 (0, 30, -12, 0, -1, -1, 0, -12, 30, 0),
+                 (0, -12, -15, -3, -3, -3, -15, -12, 0),
+                 (0, 0, -3, 0, -1, -1, 0, -3, 0, 0),
+                 (0, -1, -3, -1, -1, -1, -1, -3, -1, 0),
+                 (0, -1, -3, -1, -1, -1, -1, -3, -1, 0),
+                 (0, 0, -3, 0, -1, -1, 0, -3, 0, 0),
+                 (0, -12, -15, -3, -3, -3, -15, -12, 0),
+                 (0, 30, -12, 0, -1, -1, 0, -12, 30, 0),
+                 (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                 )
 
     for i in range(120):  # 最大120ターン
         is_finish = True  # ターン変わるたびにゲーム終了かの判定
